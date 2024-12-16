@@ -5,7 +5,7 @@ def on_login():
     Mypassword = e2.get()
     print(f"Username: {Myusername}, Password: {Mypassword}")
 
-top = Tk()hhbhhbhbh
+top = Tk()
 top.geometry("400x300")
 
 # Creating Labels
