@@ -1,6 +1,6 @@
 import sys
 import pygame
-# from PyQt6.QtCore import Qt
+from PyQt6.QtCore import Qt
 from PyQt6.QtWidgets import QApplication, QWidget, QVBoxLayout, QPushButton, QFileDialog, QLabel
 
 class MusicPlayer(QWidget):
