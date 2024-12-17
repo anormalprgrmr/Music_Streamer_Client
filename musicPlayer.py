@@ -45,7 +45,7 @@ class LoginPage(tk.Frame):
         password = self.password_entry.get()
 
         # Example validation (replace with your logic)
-        if username == "admin" and password == "password":
+        if username == "a" and password == "p":
             messagebox.showinfo("Login", "Login successful!")
             self.controller.show_page(HomePage)  # Go to the HomePage
         else:
@@ -119,11 +119,31 @@ class HomePage(tk.Frame):
     def __init__(self, parent, controller):
         super().__init__(parent)
         self.controller = controller
-        self.config(bg="#1C1C24",bd=100,padx=10)
+        self.config(bg="#1C1C24",bd=100)
+
+        # main_frame = tk.LabelFrame(self, bg='#1C1C24', bd=3, padx=0, relief=tk.SUNKEN)
+        # main_frame.place(x= 0,y=0,width= 1235,height=700 )
+
+        
+        # to_frame = tk.LabelFrame(main_frame, bg='#1C1C24', bd=3, padx=0, relief=tk.SUNKEN)
+        # to_frame.place(x= 0,y=0,width= 1235,height=150 )
+
+        # layou_frame = tk.Frame(main_frame, bg='#131315')
+        # layou_frame.pack(side=tk.RIGHT )
+        
+
+
+
+
+        # # Profile button
+        # self.profile_button = tk.Button(top_frame, text="Profile")
+        # self.profile_button.grid(row=0, column=0, padx=10, pady=10, sticky=tk.W)
+
+
         top_frame = tk.LabelFrame(self, bg='#151517', bd=3, padx=0, relief=tk.SUNKEN)
-        top_frame.grid(row=0,column=0,pady = 10 )
+        top_frame.grid(row=0,column=0 )
         layout_frame = tk.Frame(self, bg='#131315')
-        layout_frame.grid()
+        layout_frame.grid(row=1,column=0)
         array1 = list(range(40))  # First array for the first scrollable area
         array2 = list(range(50))  
         self.create_scrollable_area(layout_frame, array1, 0, action="Songs")
@@ -136,11 +156,13 @@ class HomePage(tk.Frame):
 
         # Button to navigate to the Music Player page
         button = tk.Button(self, text="Go to Music Player",bg="#151517",fg="#FEFFFA", command=self.go_to_music_player)
-        button.grid(pady=20)
+        button.grid(row=2,column=0,pady=20)
 
         # Button to navigate to the Upload page
         upload_button = tk.Button(self, text="Upload Music",bg="#151517",fg="#FEFFFA", command=self.go_to_upload_page)
-        upload_button.grid(pady=20)
+        upload_button.grid(row=3,column=0,pady=50)
+        BOTTOM_frame = tk.Label(self,text="khhhhhhhh", bg='red',width=100,height=5)
+        BOTTOM_frame.grid(row=4,column=0)
     def create_scrollable_area(self, layout_frame, array, column_index, action):
         scrollable_frame = tk.LabelFrame(layout_frame, text=action, bg='#151517', fg='#FEFFFA', border=10)  
         scrollable_frame.grid(row=0,column=column_index)  # Adjusted row index and padding
@@ -239,14 +261,14 @@ class MusicPlayerPage(tk.Frame):
         self.cover_image_label.grid(row=1,column=1)
 
         # Scale to display the song progress
-        self.progress_scale = tk.Scale(self, from_=0, to=100, orient="horizontal", length=400, sliderlength=20)
+        self.progress_scale = tk.Scale(self, from_=0, to=100, orient="horizontal", bg="#151517",fg="#FEFFFA",length=400, sliderlength=20)
         self.progress_scale.grid(row=2,column = 1,pady=10)
         # Bind to the release event
         self.progress_scale.bind("<ButtonRelease-1>", self.on_scale_release)
         self.progress_scale.bind("<Button-1>", self.on_scale_click)
 
         # Back to Home Button
-        self.back_button = tk.Button(self, text="Back to Home", font=("Arial", 12), bg="#008CBA", fg="white", command=self.back_to_home)
+        self.back_button = tk.Button(self, text="Back to Home", font=("Arial", 12),bg="#151517",fg="#FEFFFA", command=self.back_to_home)
         self.back_button.grid(row=4,column=1)
 
     def play_music(self):
@@ -331,28 +353,30 @@ class MusicPlayerPage(tk.Frame):
 class UploadPage(tk.Frame):
     def __init__(self, parent, controller):
         super().__init__(parent)
+        self.config(width=1240,height=700,padx=450,bg='#1C1C24')
         self.controller = controller
-        
-
-        # Add title label
-        label = tk.Label(self, text="Upload Music to Server", font=("Arial", 20))
-        label.pack(pady=50)
+        top_frame = tk.LabelFrame(self, bg='#151517', bd=3, padx=0, relief=tk.SUNKEN)
+        top_frame.grid(row=0,column=0,columnspan=3,pady = 100 )
+        label = tk.Label(top_frame, text="Upload Music to Server", font=("Arial", 20),bg="#151517",fg="#FEFFFA")
+        label.grid(row=0,column=0,columnspan=2,sticky=tk.E + tk.W)
+        button_frame = tk.LabelFrame(self, bg='#1C1C24', bd=3, padx=0, relief=tk.SUNKEN)
+        button_frame.grid(row=1,column=0,columnspan=3,pady = 10 )
 
         # Button to upload music
-        upload_button = tk.Button(self, text="Select Music File", command=self.select_music_file)
-        upload_button.pack(pady=20)
+        upload_button = tk.Button(button_frame, text="Select Music File",bg="#151517",fg="#FEFFFA", command=self.select_music_file)
+        upload_button.grid(row=2,column =0,pady=20)
 
         # Label to show the selected file name
-        self.selected_file_label = tk.Label(self, text="No file selected", font=("Arial", 12))
-        self.selected_file_label.pack(pady=20)
+        self.selected_file_label = tk.Label(button_frame, text="No file selected",bg="#151517",fg="#FEFFFA", font=("Arial", 12))
+        self.selected_file_label.grid(row=3,column =0,pady=20)
 
         # Button to upload the selected file
-        upload_to_server_button = tk.Button(self, text="Upload to Server", command=self.upload_file)
-        upload_to_server_button.pack(pady=20)
+        upload_to_server_button = tk.Button(button_frame, text="Upload to Server", bg="#151517",fg="#FEFFFA",command=self.upload_file)
+        upload_to_server_button.grid(row=4,column =0,pady=20)
 
         # Back to Home Button
-        back_button = tk.Button(self, text="Back to Home", command=self.back_to_home)
-        back_button.pack(pady=20)
+        back_button = tk.Button(button_frame, text="Back to Home",bg="#151517",fg="#FEFFFA", command=self.back_to_home)
+        back_button.grid(row=5,column =0,pady=20)
 
         # Store the selected file path
         self.selected_file = None
@@ -386,9 +410,27 @@ class App(tk.Tk):
         super().__init__()
 
         # Set up the main window
-        self.title("Beautiful Music Player with Page Navigation")
+        self.title("sosk koshte shode")
         self.geometry("1280x720")
         self.config(bg="#1C1C24")
+        # main_frame = tk.LabelFrame(self, bg='#1C1C24', bd=3, padx=0, relief=tk.SUNKEN)
+        # main_frame.place(x= 0,y=0,width= 1235,height=700 )
+
+        
+        # top_frame = tk.LabelFrame(main_frame, bg='#1C1C24', bd=3, padx=0, relief=tk.SUNKEN)
+        # top_frame.place(x= 0,y=0,width= 1235,height=150 )
+
+        # layout_frame = tk.Frame(main_frame, bg='#131315')
+        # layout_frame.pack(side=tk.RIGHT )
+        
+        # BOTTOM_frame = tk.LabelFrame(main_frame,text="khhhhhhhh", bg='red',width=1235,bd = 4,height=40)
+        # BOTTOM_frame.place(x=0,y=655)
+
+
+
+        # # Profile button
+        # self.profile_button = tk.Button(top_frame, text="Profile")
+        # self.profile_button.grid(row=0, column=0, padx=10, pady=10, sticky=tk.W)
 
         # Dictionary to store frames
         self.frames = {}
@@ -398,7 +440,7 @@ class App(tk.Tk):
             page_name = F.__name__
             frame = F(parent=self, controller=self)
             self.frames[page_name] = frame
-            frame.grid(row=0, column=0,columnspan=3 ,sticky=tk.W+tk.E+tk.S)
+            frame.grid(row=1, column=0 ,sticky=tk.W+tk.E+tk.S)
 
         # Show the login page initially
         self.show_page(LoginPage)
