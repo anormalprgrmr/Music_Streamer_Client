@@ -10,6 +10,110 @@ from io import BytesIO
 # Initialize pygame mixer
 pygame.mixer.init()
 
+# Login Page
+class LoginPage(tk.Frame):
+    def __init__(self, parent, controller):
+        super().__init__(parent)
+        self.controller = controller
+
+        # Add title label
+        label = tk.Label(self, text="Login", font=("Arial", 20))
+        label.pack(pady=50)
+
+        # Username Label and Entry
+        self.username_label = tk.Label(self, text="Username:", font=("Arial", 12))
+        self.username_label.pack(pady=10)
+        self.username_entry = tk.Entry(self, font=("Arial", 12))
+        self.username_entry.pack(pady=5)
+
+        # Password Label and Entry
+        self.password_label = tk.Label(self, text="Password:", font=("Arial", 12))
+        self.password_label.pack(pady=10)
+        self.password_entry = tk.Entry(self, font=("Arial", 12), show="*")
+        self.password_entry.pack(pady=5)
+
+        # Login Button
+        login_button = tk.Button(self, text="Login", font=("Arial", 14), bg="#4CAF50", fg="white", command=self.login)
+        login_button.pack(pady=20)
+
+        # Link to Sign Up page
+        signup_button = tk.Button(self, text="Don't have an account? Sign Up", font=("Arial", 12), command=self.go_to_signup_page)
+        signup_button.pack(pady=10)
+
+    def login(self):
+        username = self.username_entry.get()
+        password = self.password_entry.get()
+
+        # Example validation (replace with your logic)
+        if username == "admin" and password == "password":
+            messagebox.showinfo("Login", "Login successful!")
+            self.controller.show_page(HomePage)  # Go to the HomePage
+        else:
+            messagebox.showerror("Login", "Invalid username or password")
+
+    def go_to_signup_page(self):
+        self.controller.show_page(SignupPage)
+
+
+# Signup Page
+class SignupPage(tk.Frame):
+    def __init__(self, parent, controller):
+        super().__init__(parent)
+        self.controller = controller
+
+        # Add title label
+        label = tk.Label(self, text="Sign Up", font=("Arial", 20))
+        label.pack(pady=50)
+
+        # Username Label and Entry
+        self.username_label = tk.Label(self, text="Username:", font=("Arial", 12))
+        self.username_label.pack(pady=10)
+        self.username_entry = tk.Entry(self, font=("Arial", 12))
+        self.username_entry.pack(pady=5)
+
+        # Password Label and Entry
+        self.password_label = tk.Label(self, text="Password:", font=("Arial", 12))
+        self.password_label.pack(pady=10)
+        self.password_entry = tk.Entry(self, font=("Arial", 12), show="*")
+        self.password_entry.pack(pady=5)
+
+        # Confirm Password Label and Entry
+        self.confirm_password_label = tk.Label(self, text="Confirm Password:", font=("Arial", 12))
+        self.confirm_password_label.pack(pady=10)
+        self.confirm_password_entry = tk.Entry(self, font=("Arial", 12), show="*")
+        self.confirm_password_entry.pack(pady=5)
+
+        # Sign Up Button
+        signup_button = tk.Button(self, text="Sign Up", font=("Arial", 14), bg="#4CAF50", fg="white", command=self.signup)
+        signup_button.pack(pady=20)
+
+        # Link to Login page
+        login_button = tk.Button(self, text="Already have an account? Login", font=("Arial", 12), command=self.go_to_login_page)
+        login_button.pack(pady=10)
+
+    def signup(self):
+        username = self.username_entry.get()
+        password = self.password_entry.get()
+        confirm_password = self.confirm_password_entry.get()
+
+        # Check if password and confirm password match
+        if password != confirm_password:
+            messagebox.showerror("Signup", "Passwords do not match!")
+            return
+
+        # Example: Just a simple check for username and password (you should save this info in a database or file)
+        if username == "" or password == "":
+            messagebox.showerror("Signup", "Please fill in all fields.")
+            return
+
+        # Simulating saving the user data
+        messagebox.showinfo("Signup", "Signup successful! You can now login.")
+        self.controller.show_page(LoginPage)
+
+    def go_to_login_page(self):
+        self.controller.show_page(LoginPage)
+
+
 # Home Page
 class HomePage(tk.Frame):
     def __init__(self, parent, controller):
@@ -222,6 +326,7 @@ class MusicPlayerPage(tk.Frame):
     def back_to_home(self):
         self.controller.show_page(HomePage)
 
+
 # Upload Page
 class UploadPage(tk.Frame):
     def __init__(self, parent, controller):
@@ -270,24 +375,7 @@ class UploadPage(tk.Frame):
             return
         print(self.selected_file)
         upload_file(self.selected_file)
-        # # Prepare the file for upload
-        # files = {'file': open(self.selected_file, 'rb')}
-
-        # # Specify the URL of the server endpoint
-        # upload_url = "ws://localhost:3000/upload"  # Replace with your server URL
-
-        # try:
-        #     # Send the POST request with the file
-        #     # response = requests.post(upload_url, files=files)
-        #     if response.status_code == 200:
-        #         messagebox.showinfo("Success", "File uploaded successfully!")
-        #     else:
-        #         messagebox.showerror("Error", "Failed to upload the file.")
-        # except requests.exceptions.RequestException as e:
-        #     messagebox.showerror("Error", f"Error during upload: {str(e)}")
-        # finally:
-        #     files['file'].close()
-
+        
     def back_to_home(self):
         self.controller.show_page(HomePage)
 
@@ -306,14 +394,14 @@ class App(tk.Tk):
         self.frames = {}
 
         # Create and store frames
-        for F in (HomePage, MusicPlayerPage, UploadPage):
+        for F in (LoginPage,SignupPage, HomePage, MusicPlayerPage, UploadPage):
             page_name = F.__name__
             frame = F(parent=self, controller=self)
             self.frames[page_name] = frame
             frame.grid(row=0, column=0,columnspan=3 ,sticky=tk.W+tk.E+tk.S)
 
-        # Show the home page initially
-        self.show_page(HomePage)
+        # Show the login page initially
+        self.show_page(LoginPage)
 
     def show_page(self, page_class):
         # Hide all frames
