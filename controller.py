@@ -89,14 +89,65 @@ def get_songs():
     else:
         print('Error:', response.status_code, response.text)
 
+def login(username,password):
+    url = 'http://localhost:3000/login'
+
+    # JSON data to be sent in the body of the POST request
+    json_data = {
+        'username': username,
+        'password': password
+    }
+
+    response = requests.post(url, json=json_data)
+
+    # Checking the response
+    if response.status_code == 200:
+        print('Success!')
+        result = response.json()
+        print('Response JSON:', response.json())
+        if(result['status'] == 'success'):
+            return True
+    else:
+        print('Failed to send POST request')
+        print('Status Code:', response.status_code)
+        print('Response Text:', response.text)
+    return False
+
+def signup(username,password):
+    url = 'http://localhost:3000/signup'
+
+    # JSON data to be sent in the body of the POST request
+    json_data = {
+        'username': username,
+        'password': password
+    }
+    print('json data ', json_data)
+    response = requests.post(url,json=json_data)
+
+    # Checking the response
+    if response.status_code == 200:
+        print('Success!')
+        result = response.json()
+        print('Response JSON:', response.json())
+        if(result['status'] == 'success'):
+            return True
+    else:
+        print('Failed to send POST request')
+        print('Status Code:', response.status_code)
+        print('Response Text:', response.text)
+    return False
+
 # Main function to control the client actions
 if __name__ == "__main__":
     
     # Uncomment the action you want to perform:
     # Download file
-    download_file("Koorosh-Vanish-128.mp3")
-
+    # download_file("Koorosh-Vanish-128.mp3")
+    # result = signup('ab','12')
+    # print(result)
     # Upload file
     # upload_file()
     # get_songs()
     # pass
+    result = login('qwesss','12')
+    print('resul t ',result)
