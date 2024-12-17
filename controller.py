@@ -1,3 +1,4 @@
+import requests
 import websocket
 import os
 
@@ -6,12 +7,12 @@ websocket_url = "ws://localhost:3000/upload"
 # file_to_upload = "ss.mp3"  # Path to the file you want to upload
 
 # Function to download a file from the server
-def download_file():
+def download_file(id):
     output_file = 'ss.mp3'
     try:
         # Connect to the WebSocket server
         ws = websocket.WebSocket()
-        ws.connect("ws://localhost:3000/download")
+        ws.connect(f"ws://localhost:3000/download/{id}")
         print("Connected to the WebSocket server")
 
         while True:
@@ -78,13 +79,24 @@ def upload_file(file_to_upload):
         ws.close()
         print("WebSocket connection closed after upload.")
 
+def get_songs():
+
+    # Sending the GET request
+    response = requests.get('http://localhost:3000/getSongs')
+
+    if response.status_code == 200:
+        print('Response JSON:', response.json())  # Parse JSON response
+    else:
+        print('Error:', response.status_code, response.text)
+
 # Main function to control the client actions
 if __name__ == "__main__":
     
     # Uncomment the action you want to perform:
     # Download file
-    # download_file()
+    download_file("Koorosh-Vanish-128.mp3")
 
     # Upload file
     # upload_file()
-    pass
+    # get_songs()
+    # pass
