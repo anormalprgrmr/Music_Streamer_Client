@@ -1,10 +1,12 @@
-from asyncio import sleep
 import os
 import tkinter as tk
-from tkinter import ttk
+from tkinter import filedialog
+from tkinter import messagebox
 from PIL import Image, ImageTk
 import pygame
-
+from controller import upload_file
+import eyed3  # Add this import to handle MP3 metadata
+from io import BytesIO
 # Initialize pygame mixer
 pygame.mixer.init()
 
@@ -22,11 +24,17 @@ class HomePage(tk.Frame):
         button = tk.Button(self, text="Go to Music Player", command=self.go_to_music_player)
         button.pack(pady=20)
 
+        # Button to navigate to the Upload page
+        upload_button = tk.Button(self, text="Upload Music", command=self.go_to_upload_page)
+        upload_button.pack(pady=20)
+
     def go_to_music_player(self):
         self.controller.show_page(MusicPlayerPage)
 
+    def go_to_upload_page(self):
+        self.controller.show_page(UploadPage)
 
-# Music Player Page
+
 class MusicPlayerPage(tk.Frame):
     def __init__(self, parent, controller):
         super().__init__(parent)
@@ -35,6 +43,7 @@ class MusicPlayerPage(tk.Frame):
         self.is_playing = False
         self.song_length = 0
         self.music_file = "ss.mp3"  # Replace with the actual path to the music file
+        self.manual_update = False  # Flag to detect manual updates on the scale
 
         # Create widgets
         self.play_button = tk.Button(self, text="Play", font=("Arial", 14), bg="#4CAF50", fg="white", command=self.play_music)
@@ -47,10 +56,12 @@ class MusicPlayerPage(tk.Frame):
         self.cover_image_label = tk.Label(self)
         self.cover_image_label.pack(pady=10)
 
-        # Progress bar to display the song progress
-        self.progress_bar = ttk.Progressbar(self, length=400, mode="determinate")
-        self.progress_bar.pack(pady=20)
-        self.progress_bar.bind("<ButtonRelease-1>", self.on_progress_bar_click)
+        # Scale to display the song progress
+        self.progress_scale = tk.Scale(self, from_=0, to=100, orient="horizontal", length=400, sliderlength=20)
+        self.progress_scale.pack(pady=20)
+        # Bind to the release event
+        self.progress_scale.bind("<ButtonRelease-1>", self.on_scale_release)
+        self.progress_scale.bind("<Button-1>", self.on_scale_click)
 
         # Back to Home Button
         self.back_button = tk.Button(self, text="Back to Home", font=("Arial", 12), bg="#008CBA", fg="white", command=self.back_to_home)
@@ -69,30 +80,31 @@ class MusicPlayerPage(tk.Frame):
             # Get song length (in seconds)
             self.song_length = pygame.mixer.Sound(self.music_file).get_length()
 
-            # Show the cover image
-            self.show_cover_image("your_album_cover.jpg")  # Replace with actual image file
+            # Extract cover image from the MP3 file
+            self.show_cover_image_from_mp3(self.music_file)
 
-            # Start updating progress bar
-            self.update_progress_bar()
+            # Start updating the scale (song progress)
+            self.update_progress_scale()
 
     def stop_music(self):
         if self.is_playing:
             pygame.mixer.music.stop()
             self.is_playing = False
-            self.progress_bar['value'] = 0  # Reset progress bar
+            self.progress_scale.set(0)  # Reset progress scale
             self.cover_image_label.config(image="")  # Clear cover image
 
-    def update_progress_bar(self):
+    def update_progress_scale(self):
         if self.is_playing:
-            # pass
             # Get the current position of the song (in seconds)
             current_time = pygame.mixer.music.get_pos() / 1000  # Convert milliseconds to seconds
             progress = (current_time / self.song_length) * 100  # Calculate progress as a percentage
-            self.progress_bar['value'] = progress
 
-            # Continue updating the progress bar if the song is still playing
-            # if current_time < self.song_length:
-            #     self.after(100, self.update_progress_bar)  # Update every 100ms
+            # Only update scale if the user hasn't manually changed it
+            if not self.manual_update:
+                self.progress_scale.set(progress)  # Update the scale
+
+            # Continue updating the progress scale every 100ms
+            self.after(100, self.update_progress_scale)  # Keep updating even if the song is near the end
 
     def show_cover_image(self, image_path):
         if not os.path.exists(image_path):
@@ -107,22 +119,104 @@ class MusicPlayerPage(tk.Frame):
         # Display the cover image
         self.cover_image_label.config(image=self.cover_image)
 
-    def on_progress_bar_click(self, event):
-        # Get the position where the user clicked on the progress bar
-        click_position = event.x
-        progress_percentage = (click_position / self.progress_bar.winfo_width()) * 100
-        print('sss ',progress_percentage)
-        # Set the music position based on the clicked position
-        pygame.mixer.music.set_pos((progress_percentage / 100) * self.song_length)
+    def show_cover_image_from_mp3(self, mp3_file):
+        """Extract and show cover image from MP3 metadata"""
+        audio_file = eyed3.load(mp3_file)
 
-        # Start updating the progress bar from the new position
-        # current_time = pygame.mixer.music.get_pos() / 1000  # Convert milliseconds to seconds
-        # progress = (current_time / self.song_length) * 100  # Calculate progress as a percentage
-        # self.progress_bar['value'] = progress_percentage
-        self.update_progress_bar()
-        # print(current_time)
-        print(self.song_length)
-        # print(progress)
+        # Check if there's any album art
+        if audio_file.tag is not None and audio_file.tag.images:
+            # Get the first image (usually album art)
+            image_data = audio_file.tag.images[0].image_data
+
+            # Open the image from binary data
+            image = Image.open(BytesIO(image_data))
+            image = image.resize((150, 150))  # Resize to fit the window
+
+            # Convert to PhotoImage and display it
+            self.cover_image = ImageTk.PhotoImage(image)
+            self.cover_image_label.config(image=self.cover_image)
+        else:
+            print("No cover image found in MP3 metadata.")
+
+    def on_scale_release(self, event):
+        """When the user releases the scale, update the song's position"""
+        self.manual_update = False  # Reset the flag when user releases the slider
+        progress_percentage = float(self.progress_scale.get())
+        new_pos = (progress_percentage / 100) * self.song_length  # Convert percentage to actual seconds
+        pygame.mixer.music.set_pos(new_pos)  # Set the new position in the song
+
+    def on_scale_click(self, event):
+        """Flag that the user is manually adjusting the slider"""
+        self.manual_update = True
+
+    def back_to_home(self):
+        self.controller.show_page(HomePage)
+
+# Upload Page
+class UploadPage(tk.Frame):
+    def __init__(self, parent, controller):
+        super().__init__(parent)
+        self.controller = controller
+        
+
+        # Add title label
+        label = tk.Label(self, text="Upload Music to Server", font=("Arial", 20))
+        label.pack(pady=50)
+
+        # Button to upload music
+        upload_button = tk.Button(self, text="Select Music File", command=self.select_music_file)
+        upload_button.pack(pady=20)
+
+        # Label to show the selected file name
+        self.selected_file_label = tk.Label(self, text="No file selected", font=("Arial", 12))
+        self.selected_file_label.pack(pady=20)
+
+        # Button to upload the selected file
+        upload_to_server_button = tk.Button(self, text="Upload to Server", command=self.upload_file)
+        upload_to_server_button.pack(pady=20)
+
+        # Back to Home Button
+        back_button = tk.Button(self, text="Back to Home", command=self.back_to_home)
+        back_button.pack(pady=20)
+
+        # Store the selected file path
+        self.selected_file = None
+
+    def select_music_file(self):
+        """Open file dialog to select an MP3 file."""
+        file_path = filedialog.askopenfilename(
+            title="Select a Music File", 
+            filetypes=[("MP3 Files", "*.mp3")]
+        )
+        if file_path:
+            self.selected_file = file_path
+            self.selected_file_label.config(text=f"Selected File: {os.path.basename(file_path)}")
+
+    def upload_file(self):
+        """Upload the selected file to the server."""
+        print('uploooood')
+        if not self.selected_file:
+            messagebox.showerror("Error", "No file selected!")
+            return
+        print(self.selected_file)
+        upload_file(self.selected_file)
+        # # Prepare the file for upload
+        # files = {'file': open(self.selected_file, 'rb')}
+
+        # # Specify the URL of the server endpoint
+        # upload_url = "ws://localhost:3000/upload"  # Replace with your server URL
+
+        # try:
+        #     # Send the POST request with the file
+        #     # response = requests.post(upload_url, files=files)
+        #     if response.status_code == 200:
+        #         messagebox.showinfo("Success", "File uploaded successfully!")
+        #     else:
+        #         messagebox.showerror("Error", "Failed to upload the file.")
+        # except requests.exceptions.RequestException as e:
+        #     messagebox.showerror("Error", f"Error during upload: {str(e)}")
+        # finally:
+        #     files['file'].close()
 
     def back_to_home(self):
         self.controller.show_page(HomePage)
@@ -141,7 +235,7 @@ class App(tk.Tk):
         self.frames = {}
 
         # Create and store frames
-        for F in (HomePage, MusicPlayerPage):
+        for F in (HomePage, MusicPlayerPage, UploadPage):
             page_name = F.__name__
             frame = F(parent=self, controller=self)
             self.frames[page_name] = frame

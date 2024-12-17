@@ -3,7 +3,7 @@ import os
 
 # Define the WebSocket URL and the file paths
 websocket_url = "ws://localhost:3000/upload"
-file_to_upload = "ss.mp3"  # Path to the file you want to upload
+# file_to_upload = "ss.mp3"  # Path to the file you want to upload
 
 # Function to download a file from the server
 def download_file():
@@ -44,13 +44,16 @@ def download_file():
         print("WebSocket connection closed.")
 
 # Function to upload a file to the server
-def upload_file():
+def upload_file(file_to_upload):
     try:
         # Connect to the WebSocket server for uploading
         ws = websocket.WebSocket()
         ws.connect(websocket_url)
         print("Connected to the WebSocket server for upload")
+        file_name = os.path.basename(file_to_upload)
+        ws.send('file')
 
+        ws.send(file_name)
         # Open the file to be uploaded
         with open(file_to_upload, 'rb') as f:
             # Read the file in chunks and send each chunk
@@ -77,10 +80,11 @@ def upload_file():
 
 # Main function to control the client actions
 if __name__ == "__main__":
+    
     # Uncomment the action you want to perform:
     # Download file
     # download_file()
 
     # Upload file
-    upload_file()
-    # pass
+    # upload_file()
+    pass
