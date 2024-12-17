@@ -4,7 +4,7 @@ from tkinter import filedialog
 from tkinter import messagebox
 from PIL import Image, ImageTk
 import pygame
-from controller import upload_file
+from controller import upload_file ,  login , signup
 import eyed3  # Add this import to handle MP3 metadata
 from io import BytesIO
 # Initialize pygame mixer
@@ -44,9 +44,13 @@ class LoginPage(tk.Frame):
         username = self.username_entry.get()
         password = self.password_entry.get()
 
+        result = login(username,password)
         # Example validation (replace with your logic)
         if username == "admin" and password == "password":
             messagebox.showinfo("Login", "Login successful!")
+            self.controller.show_page(HomePage)  # Go to the HomePage
+        elif(result):
+            messagebox.showinfo("Loginnnnnnnn", "Login successful!")
             self.controller.show_page(HomePage)  # Go to the HomePage
         else:
             messagebox.showerror("Login", "Invalid username or password")
@@ -105,10 +109,13 @@ class SignupPage(tk.Frame):
         if username == "" or password == "":
             messagebox.showerror("Signup", "Please fill in all fields.")
             return
-
-        # Simulating saving the user data
-        messagebox.showinfo("Signup", "Signup successful! You can now login.")
-        self.controller.show_page(LoginPage)
+        print('before')
+        result = signup(username,password)
+        print('agter')
+        if(result):
+            # Simulating saving the user data
+            messagebox.showinfo("Signup", "Signup successful! You can now login.")
+            self.controller.show_page(LoginPage)
 
     def go_to_login_page(self):
         self.controller.show_page(LoginPage)
