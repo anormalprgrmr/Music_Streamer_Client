@@ -15,18 +15,85 @@ class HomePage(tk.Frame):
     def __init__(self, parent, controller):
         super().__init__(parent)
         self.controller = controller
+        self.config(bg="#1C1C24",bd=100,padx=10)
+        top_frame = tk.LabelFrame(self, bg='#151517', bd=3, padx=0, relief=tk.SUNKEN)
+        top_frame.grid(row=0,column=0,pady = 10 )
+        layout_frame = tk.Frame(self, bg='#131315')
+        layout_frame.grid()
+        array1 = list(range(40))  # First array for the first scrollable area
+        array2 = list(range(50))  
+        self.create_scrollable_area(layout_frame, array1, 0, action="Songs")
+        self.create_scrollable_area(layout_frame, array2, 1, action="Playlist")  # Changed column_index to 1 for better layout
+
 
         # Add title label
-        label = tk.Label(self, text="Welcome to the Music Player", font=("Arial", 20))
-        label.pack(pady=50)
+        label = tk.Label(top_frame, text="Welcome to the Music Player", font=("Arial", 20),bg="#151517",fg="#FEFFFA")
+        label.grid(row=0,column=0,columnspan=3,sticky=tk.E + tk.W)
 
         # Button to navigate to the Music Player page
-        button = tk.Button(self, text="Go to Music Player", command=self.go_to_music_player)
-        button.pack(pady=20)
+        button = tk.Button(self, text="Go to Music Player",bg="#151517",fg="#FEFFFA", command=self.go_to_music_player)
+        button.grid(pady=20)
 
         # Button to navigate to the Upload page
-        upload_button = tk.Button(self, text="Upload Music", command=self.go_to_upload_page)
-        upload_button.pack(pady=20)
+        upload_button = tk.Button(self, text="Upload Music",bg="#151517",fg="#FEFFFA", command=self.go_to_upload_page)
+        upload_button.grid(pady=20)
+    def create_scrollable_area(self, layout_frame, array, column_index, action):
+        scrollable_frame = tk.LabelFrame(layout_frame, text=action, bg='#151517', fg='#FEFFFA', border=10)  
+        scrollable_frame.grid(row=0,column=column_index)  # Adjusted row index and padding
+
+        # Create a vertical scrollbar
+        v = tk.Scrollbar(scrollable_frame)
+        v.pack(side='right', fill='y')
+
+        # Create a canvas to hold the scrollable frame
+        canvas = tk.Canvas(scrollable_frame, bg='#151517')
+        canvas.pack(side='left', fill='both', expand=True)
+
+        # Attach the vertical scrollbar to the canvas
+        v.config(command=canvas.yview)
+        canvas.config(yscrollcommand=v.set)
+
+        # Create a scrollable frame in the canvas
+        scrollable_internal_frame = tk.Frame(canvas, bg='#151517')
+        canvas.create_window((0, 0), window=scrollable_internal_frame, anchor="nw")
+
+        # Configure the scrollable frame to update the scroll region
+        scrollable_internal_frame.bind(
+            "<Configure>",
+            lambda e: canvas.configure(scrollregion=canvas.bbox("all"))
+        )
+        
+        if action == "Songs":
+            self.create_songs(scrollable_internal_frame, array)
+        else:
+            self.create_playlists(scrollable_internal_frame, array)
+
+    def create_playlists(self, scrollable_frame, array):
+        for i in range(len(array)):
+            button_text = f"playlist {array[i]}"
+            button = tk.Button(scrollable_frame, text=button_text, command=lambda text=button_text: self.open_new_window(text), padx=100, fg='#FEFFFA')
+            button.configure(bg="#22222C")
+            number = tk.Label(scrollable_frame, text=f"{i + 1}.", padx=5)
+            number.grid(row=i, column=0)
+            button.grid(row=i, column=1)
+
+    def create_songs(self, scrollable_frame, array):
+        for i in range(len(array)):
+            button_text = f"song {array[i]}"
+            button = tk.Button(scrollable_frame, text=button_text, command=lambda text=button_text: self.open_new_window(text), padx=100, fg='#FEFFFA', anchor="e")
+            button.configure(bg="#22222C")
+            number = tk.Label(scrollable_frame, text=f"{i + 1}.", padx=5)
+            number.grid(row=i, column=0)
+            button.grid(row=i, column=1)
+
+    def open_new_window(self, button_name):
+        new_window = tk.Toplevel()
+        new_window.title(button_name)
+        label = tk.Label(new_window, text=f"You clicked {button_name}!")
+        label.pack(padx=20, pady=20)
+
+    def profile_action(self):
+        messagebox.showinfo("Profile", "Profile button clicked!")
 
     def go_to_music_player(self):
         self.controller.show_page(MusicPlayerPage)
@@ -35,37 +102,48 @@ class HomePage(tk.Frame):
         self.controller.show_page(UploadPage)
 
 
+
 class MusicPlayerPage(tk.Frame):
     def __init__(self, parent, controller):
         super().__init__(parent)
         self.controller = controller
+        self.config(width=1240,height=700,padx=450,bg='#1C1C24')
+        global songname
+        songname = "madareto"
 
         self.is_playing = False
         self.song_length = 0
         self.music_file = "ss.mp3"  # Replace with the actual path to the music file
         self.manual_update = False  # Flag to detect manual updates on the scale
+        top_frame = tk.LabelFrame(self, bg='#151517', bd=3, padx=0, relief=tk.SUNKEN)
+        top_frame.grid(row=0,column=0,columnspan=3,pady = 100 )
+        label = tk.Label(top_frame, text=songname, font=("Arial", 20),bg="#151517",fg="#FEFFFA")
+        label.grid(row=0,column=0,columnspan=2,sticky=tk.E + tk.W)
+
+        button_frame = tk.LabelFrame(self, bg='#1C1C24', bd=3, padx=0, relief=tk.SUNKEN)
+        button_frame.grid(row=3,column=1,columnspan=3,pady = 10 )
 
         # Create widgets
-        self.play_button = tk.Button(self, text="Play", font=("Arial", 14), bg="#4CAF50", fg="white", command=self.play_music)
-        self.play_button.pack(pady=10)
+        self.play_button = tk.Button(button_frame, text="Play", font=("Arial", 14),bg="#151517",fg="#FEFFFA", command=self.play_music)
+        self.play_button.grid(row=3,column=0,padx=50)
 
-        self.stop_button = tk.Button(self, text="Stop", font=("Arial", 14), bg="#f44336", fg="white", command=self.stop_music)
-        self.stop_button.pack(pady=10)
+        self.stop_button = tk.Button(button_frame, text="Stop", font=("Arial", 14),bg="#151517",fg="#FEFFFA", command=self.stop_music)
+        self.stop_button.grid(row=3,column=2,padx=50)
 
         # Add cover image display
-        self.cover_image_label = tk.Label(self)
-        self.cover_image_label.pack(pady=10)
+        self.cover_image_label = tk.Label(self,width=20,height=10)
+        self.cover_image_label.grid(row=1,column=1)
 
         # Scale to display the song progress
         self.progress_scale = tk.Scale(self, from_=0, to=100, orient="horizontal", length=400, sliderlength=20)
-        self.progress_scale.pack(pady=20)
+        self.progress_scale.grid(row=2,column = 1,pady=10)
         # Bind to the release event
         self.progress_scale.bind("<ButtonRelease-1>", self.on_scale_release)
         self.progress_scale.bind("<Button-1>", self.on_scale_click)
 
         # Back to Home Button
         self.back_button = tk.Button(self, text="Back to Home", font=("Arial", 12), bg="#008CBA", fg="white", command=self.back_to_home)
-        self.back_button.pack(pady=10)
+        self.back_button.grid(row=4,column=1)
 
     def play_music(self):
         if not self.is_playing:
@@ -91,7 +169,7 @@ class MusicPlayerPage(tk.Frame):
             pygame.mixer.music.stop()
             self.is_playing = False
             self.progress_scale.set(0)  # Reset progress scale
-            self.cover_image_label.config(image="")  # Clear cover image
+            self.cover_image_label1.config(image="")  # Clear cover image
 
     def update_progress_scale(self):
         if self.is_playing:
@@ -106,18 +184,6 @@ class MusicPlayerPage(tk.Frame):
             # Continue updating the progress scale every 100ms
             self.after(100, self.update_progress_scale)  # Keep updating even if the song is near the end
 
-    def show_cover_image(self, image_path):
-        if not os.path.exists(image_path):
-            print(f"Error: Cover image '{image_path}' not found.")
-            return
-
-        # Open and resize the image
-        image = Image.open(image_path)
-        image = image.resize((150, 150))  # Resize the image to fit the window
-        self.cover_image = ImageTk.PhotoImage(image)
-
-        # Display the cover image
-        self.cover_image_label.config(image=self.cover_image)
 
     def show_cover_image_from_mp3(self, mp3_file):
         """Extract and show cover image from MP3 metadata"""
@@ -127,6 +193,7 @@ class MusicPlayerPage(tk.Frame):
         if audio_file.tag is not None and audio_file.tag.images:
             # Get the first image (usually album art)
             image_data = audio_file.tag.images[0].image_data
+            
 
             # Open the image from binary data
             image = Image.open(BytesIO(image_data))
@@ -134,7 +201,10 @@ class MusicPlayerPage(tk.Frame):
 
             # Convert to PhotoImage and display it
             self.cover_image = ImageTk.PhotoImage(image)
-            self.cover_image_label.config(image=self.cover_image)
+            self.cover_image_label.grid_forget
+            self.cover_image_label1 = tk.Label(self)
+            self.cover_image_label1.grid(row=1,column=1)
+            self.cover_image_label1.config(image=self.cover_image)
         else:
             print("No cover image found in MP3 metadata.")
 
@@ -229,7 +299,8 @@ class App(tk.Tk):
 
         # Set up the main window
         self.title("Beautiful Music Player with Page Navigation")
-        self.geometry("500x400")
+        self.geometry("1280x720")
+        self.config(bg="#1C1C24")
 
         # Dictionary to store frames
         self.frames = {}
@@ -239,7 +310,7 @@ class App(tk.Tk):
             page_name = F.__name__
             frame = F(parent=self, controller=self)
             self.frames[page_name] = frame
-            frame.grid(row=0, column=0, sticky="nsew")
+            frame.grid(row=0, column=0,columnspan=3 ,sticky=tk.W+tk.E+tk.S)
 
         # Show the home page initially
         self.show_page(HomePage)
@@ -252,7 +323,7 @@ class App(tk.Tk):
         # Show the selected frame
         page_name = page_class.__name__
         frame = self.frames[page_name]
-        frame.grid(row=0, column=0, sticky="nsew")
+        frame.grid(row=0,column =0)
 
 
 # Run the application
