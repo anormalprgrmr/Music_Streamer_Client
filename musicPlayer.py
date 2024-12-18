@@ -4,7 +4,7 @@ from tkinter import PhotoImage, filedialog
 from tkinter import messagebox
 from PIL import Image, ImageTk
 import pygame
-from controller import upload_file ,  login , signup
+from controller import upload_file ,  login , signup , get_songs
 import eyed3  # Add this import to handle MP3 metadata
 from io import BytesIO
 # Initialize pygame mixer
@@ -57,6 +57,9 @@ class LoginPage(tk.Frame):
 
     def go_to_signup_page(self):
         self.controller.show_page(SignupPage)
+    def OnShow(self):
+        print('onShow loginn')
+    
 
 
 # Signup Page
@@ -129,8 +132,8 @@ class HomePage(tk.Frame):
         self.config(bg="#1C1C24",bd=100,height=700,width=1000,pady=0,padx=70)
         self.columnconfigure(tuple(range(60)), weight=1)
         self.rowconfigure(tuple(range(30)), weight=1)
-
-
+        print('initttttttttttt')
+        self.songs = []
 
         top_frame = tk.LabelFrame(self, bg='#151517', bd=3, padx=0, relief=tk.SUNKEN,height=500)
         top_frame.grid(row=0,column=0,columnspan=4 ,sticky="news")
@@ -151,6 +154,18 @@ class HomePage(tk.Frame):
 
         
         search_bar.insert(index=0,string="this dont work")
+        
+    def OnShow(self):
+
+        self.songs.clear()
+
+        result = get_songs()
+        print('ressssssult is : ',result)
+
+        for i in result['hi']:
+            self.songs.append(i)
+        print('adssadsa ',self.songs)
+
         layout_frame = tk.Frame(self, bg='#131315')
         layout_frame.grid(row=1,column=0,columnspan=3,pady=0)
         array1 = list(range(40))  # First array for the first scrollable area
@@ -178,6 +193,8 @@ class HomePage(tk.Frame):
         play_button.grid(row=0,column=1,padx=250,pady=10)
         cover_label = tk.Label(BOTTOM_frame,text="kh")
         cover_label.grid(row=0,column=0,padx=100,pady=10)
+        
+    
     def create_scrollable_area(self, layout_frame, array, column_index, action):
         scrollable_frame = tk.LabelFrame(layout_frame, text=action, bg='#151517', fg='#FEFFFA', border=10)  
         scrollable_frame.grid(row=2,column=column_index,pady=10,padx=10)  # Adjusted row index and padding
@@ -219,8 +236,9 @@ class HomePage(tk.Frame):
             button.grid(row=i, column=1)
 
     def create_songs(self, scrollable_frame, array):
-        for i in range(len(array)):
-            button_text = f"song {array[i]}"
+        for i in range(len(self.songs)):
+            print(f'i is {i} and {self.songs[i]}')
+            button_text = f"song {self.songs[i]['title']}"
             button = tk.Button(scrollable_frame, text=button_text, command=lambda text=button_text: self.open_new_window(text), padx=100, fg='#FEFFFA', anchor="e")
             button.configure(bg="#22222C")
             number = tk.Label(scrollable_frame, text=f"{i + 1}.", padx=5)
@@ -285,7 +303,9 @@ class MusicPlayerPage(tk.Frame):
         # Back to Home Button
         self.back_button = tk.Button(self, text="Back to Home", font=("Arial", 12),bg="#151517",fg="#FEFFFA", command=self.back_to_home)
         self.back_button.grid(row=4,column=1)
-
+    def OnShow(self):
+        print('onShow')
+    
     def play_music(self):
         if not self.is_playing:
             if not os.path.exists(self.music_file):
@@ -470,6 +490,8 @@ class App(tk.Tk):
         page_name = page_class.__name__
         frame = self.frames[page_name]
         frame.grid(row=0,column =0,sticky="nsew")
+        if hasattr(frame, 'OnShow'):
+            frame.OnShow()
 
 
 # Run the application
