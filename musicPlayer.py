@@ -1,6 +1,6 @@
 import os
 import tkinter as tk
-from tkinter import filedialog
+from tkinter import PhotoImage, filedialog
 from tkinter import messagebox
 from PIL import Image, ImageTk
 import pygame
@@ -44,14 +44,14 @@ class LoginPage(tk.Frame):
         username = self.username_entry.get()
         password = self.password_entry.get()
 
-        result = login(username,password)
+        # result = login(username,password)
         # Example validation (replace with your logic)
         if username == "a" and password == "p":
             messagebox.showinfo("Login", "Login successful!")
             self.controller.show_page(HomePage)  # Go to the HomePage
-        elif(result):
-            messagebox.showinfo("Loginnnnnnnn", "Login successful!")
-            self.controller.show_page(HomePage)  # Go to the HomePage
+        # elif(result):
+        #     messagebox.showinfo("Loginnnnnnnn", "Login successful!")
+        #     self.controller.show_page(HomePage)  # Go to the HomePage
         else:
             messagebox.showerror("Login", "Invalid username or password")
 
@@ -126,31 +126,33 @@ class HomePage(tk.Frame):
     def __init__(self, parent, controller):
         super().__init__(parent)
         self.controller = controller
-        self.config(bg="#1C1C24",bd=100)
+        self.config(bg="#1C1C24",bd=100,height=700,width=1000,pady=0,padx=70)
+        self.columnconfigure(tuple(range(60)), weight=1)
+        self.rowconfigure(tuple(range(30)), weight=1)
 
-        # main_frame = tk.LabelFrame(self, bg='#1C1C24', bd=3, padx=0, relief=tk.SUNKEN)
-        # main_frame.place(x= 0,y=0,width= 1235,height=700 )
+
+
+        top_frame = tk.LabelFrame(self, bg='#151517', bd=3, padx=0, relief=tk.SUNKEN,height=500)
+        top_frame.grid(row=0,column=0,columnspan=4 ,sticky="news")
+
+        profile_button= tk.Button(top_frame, text="oooo",bg="#FEFFFA", command=self.profile_action)
+        profile_button.grid(row=0,column=0,padx=20,sticky="news",pady=10)
+
+        search_bar = tk.Entry(top_frame)
+        search_bar.grid(row=0,column=1,padx=20,pady=10)
+
+        plceholder_label = tk.Label(top_frame,text="",bg='#151517')
+        plceholder_label.grid(row=0,column=2,padx=280,pady=10)
+
+        self.sosk_image_photo = PhotoImage(file="sk.PNG")
+        self.sosk_image_photo = self.sosk_image_photo.subsample(15, 15)
+        sosk_image = tk.Label(top_frame, image=self.sosk_image_photo)
+        sosk_image.grid(row=0, column=3)
 
         
-        # to_frame = tk.LabelFrame(main_frame, bg='#1C1C24', bd=3, padx=0, relief=tk.SUNKEN)
-        # to_frame.place(x= 0,y=0,width= 1235,height=150 )
-
-        # layou_frame = tk.Frame(main_frame, bg='#131315')
-        # layou_frame.pack(side=tk.RIGHT )
-        
-
-
-
-
-        # # Profile button
-        # self.profile_button = tk.Button(top_frame, text="Profile")
-        # self.profile_button.grid(row=0, column=0, padx=10, pady=10, sticky=tk.W)
-
-
-        top_frame = tk.LabelFrame(self, bg='#151517', bd=3, padx=0, relief=tk.SUNKEN)
-        top_frame.grid(row=0,column=0 )
+        search_bar.insert(index=0,string="this dont work")
         layout_frame = tk.Frame(self, bg='#131315')
-        layout_frame.grid(row=1,column=0)
+        layout_frame.grid(row=1,column=0,columnspan=3,pady=0)
         array1 = list(range(40))  # First array for the first scrollable area
         array2 = list(range(50))  
         self.create_scrollable_area(layout_frame, array1, 0, action="Songs")
@@ -158,21 +160,27 @@ class HomePage(tk.Frame):
 
 
         # Add title label
-        label = tk.Label(top_frame, text="Welcome to the Music Player", font=("Arial", 20),bg="#151517",fg="#FEFFFA")
+        label = tk.Label(layout_frame, text="Welcome to the Music Player", font=("Arial", 20),bg="#151517",fg="#FEFFFA")
         label.grid(row=0,column=0,columnspan=3,sticky=tk.E + tk.W)
 
         # Button to navigate to the Music Player page
-        button = tk.Button(self, text="Go to Music Player",bg="#151517",fg="#FEFFFA", command=self.go_to_music_player)
-        button.grid(row=2,column=0,pady=20)
+        button = tk.Button(layout_frame, text="Go to Music Player",bg="#151517",fg="#FEFFFA", command=self.go_to_music_player)
+        button.grid(row=1,column=0,pady=5)
 
         # Button to navigate to the Upload page
-        upload_button = tk.Button(self, text="Upload Music",bg="#151517",fg="#FEFFFA", command=self.go_to_upload_page)
-        upload_button.grid(row=3,column=0,pady=50)
-        BOTTOM_frame = tk.Label(self,text="khhhhhhhh", bg='red',width=100,height=5)
-        BOTTOM_frame.grid(row=4,column=0)
+        upload_button = tk.Button(layout_frame, text="Upload Music",bg="#151517",fg="#FEFFFA", command=self.go_to_upload_page)
+        upload_button.grid(row=1,column=1,pady=5)
+        BOTTOM_frame = tk.LabelFrame(layout_frame,text="playing", bg="#22222C",height=5)
+        BOTTOM_frame.grid(row=4,column=0,columnspan=3,pady=10)
+        stop_button = tk.Button(BOTTOM_frame, text="stop",bg="#151517",fg="#FEFFFA", command=self.go_to_music_player)
+        stop_button.grid(row=0,column=2,padx=100,pady=10)
+        play_button = tk.Button(BOTTOM_frame, text="play",bg="#151517",fg="#FEFFFA", command=self.go_to_upload_page)
+        play_button.grid(row=0,column=1,padx=250,pady=10)
+        cover_label = tk.Label(BOTTOM_frame,text="kh")
+        cover_label.grid(row=0,column=0,padx=100,pady=10)
     def create_scrollable_area(self, layout_frame, array, column_index, action):
         scrollable_frame = tk.LabelFrame(layout_frame, text=action, bg='#151517', fg='#FEFFFA', border=10)  
-        scrollable_frame.grid(row=0,column=column_index)  # Adjusted row index and padding
+        scrollable_frame.grid(row=2,column=column_index,pady=10,padx=10)  # Adjusted row index and padding
 
         # Create a vertical scrollbar
         v = tk.Scrollbar(scrollable_frame)
@@ -420,6 +428,7 @@ class App(tk.Tk):
         self.title("sosk koshte shode")
         self.geometry("1280x720")
         self.config(bg="#1C1C24")
+
         # main_frame = tk.LabelFrame(self, bg='#1C1C24', bd=3, padx=0, relief=tk.SUNKEN)
         # main_frame.place(x= 0,y=0,width= 1235,height=700 )
 
@@ -447,7 +456,7 @@ class App(tk.Tk):
             page_name = F.__name__
             frame = F(parent=self, controller=self)
             self.frames[page_name] = frame
-            frame.grid(row=1, column=0 ,sticky=tk.W+tk.E+tk.S)
+            frame.grid(row=1, column=0 ,sticky=tk.W+tk.E+tk.S+tk.N)
 
         # Show the login page initially
         self.show_page(LoginPage)
@@ -460,7 +469,7 @@ class App(tk.Tk):
         # Show the selected frame
         page_name = page_class.__name__
         frame = self.frames[page_name]
-        frame.grid(row=0,column =0)
+        frame.grid(row=0,column =0,sticky="nsew")
 
 
 # Run the application
