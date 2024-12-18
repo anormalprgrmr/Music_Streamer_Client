@@ -86,6 +86,7 @@ def get_songs():
 
     if response.status_code == 200:
         print('Response JSON:', response.json())  # Parse JSON response
+        return response.json()
     else:
         print('Error:', response.status_code, response.text)
 
@@ -148,6 +149,6 @@ if __name__ == "__main__":
     # Upload file
     # upload_file()
     # get_songs()
-    # pass
-    result = login('qwesss','12')
-    print('resul t ',result)
+    pass
+    # result = login('qwesss','12')
+    # print('resul t ',result)
