@@ -249,6 +249,9 @@ class HomePage(tk.Frame):
         label.grid(row = 0,column=0,padx=20, pady=20)
         entry = tk.Entry(new_window)
         entry.grid(row = 1,column=0,padx=20, pady=20)
+        self.playlists.append(entry.get)
+        submit = tk.Button(new_window,text="submit",command=quit)
+        submit.grid(row=2,column=0,padx=20,pady=20)
 
 
     def create_songs(self, scrollable_frame, array):
