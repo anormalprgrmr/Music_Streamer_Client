@@ -14,6 +14,7 @@ pygame.mixer.init()
 class LoginPage(tk.Frame):
     def __init__(self, parent, controller):
         super().__init__(parent)
+        self.config(width=1240,height=700,padx=500,bg='#1C1C24')
         self.controller = controller
 
         # Add title label
@@ -63,6 +64,7 @@ class LoginPage(tk.Frame):
 class SignupPage(tk.Frame):
     def __init__(self, parent, controller):
         super().__init__(parent)
+        self.config(width=1240,height=700,padx=500,bg='#1C1C24')
         self.controller = controller
 
         # Add title label
@@ -126,33 +128,34 @@ class HomePage(tk.Frame):
     def __init__(self, parent, controller):
         super().__init__(parent)
         self.controller = controller
-        self.config(bg="#1C1C24",bd=100,height=700,width=1000,pady=0,padx=70)
+        self.config(width=1400,height=700,padx=5,bg='#1C1C24')
+
         self.columnconfigure(tuple(range(60)), weight=1)
         self.rowconfigure(tuple(range(30)), weight=1)
 
 
 
-        top_frame = tk.LabelFrame(self, bg='#151517', bd=3, padx=0, relief=tk.SUNKEN,height=500)
-        top_frame.grid(row=0,column=0,columnspan=4 ,sticky="news")
+        top_frame = tk.LabelFrame(self, bg='#1A1A20', bd=3, padx=2, relief=tk.SUNKEN,height=500)
+        top_frame.grid(row=0,column=0,columnspan=4 ,sticky="news",pady=10)
 
-        profile_button= tk.Button(top_frame, text="oooo",bg="#FEFFFA", command=self.profile_action)
+        profile_button= tk.Button(top_frame, text="oooo",bg="#FEFFFA", command=self.profile_action,width=10)
         profile_button.grid(row=0,column=0,padx=20,sticky="news",pady=10)
 
         search_bar = tk.Entry(top_frame)
         search_bar.grid(row=0,column=1,padx=20,pady=10)
 
-        plceholder_label = tk.Label(top_frame,text="",bg='#151517')
-        plceholder_label.grid(row=0,column=2,padx=280,pady=10)
+        plceholder_label = tk.Label(top_frame,text="",bg='#1A1A20')
+        plceholder_label.grid(row=0,column=2,padx=400,pady=10)
 
         self.sosk_image_photo = PhotoImage(file="sk.PNG")
-        self.sosk_image_photo = self.sosk_image_photo.subsample(15, 15)
-        sosk_image = tk.Label(top_frame, image=self.sosk_image_photo)
-        sosk_image.grid(row=0, column=3)
+        # self.sosk_image_photo = self.sosk_image_photo.subsample(20, 20)
+        sosk_image = tk.Label(top_frame, image=self.sosk_image_photo,bd=0)
+        sosk_image.grid(row=0, column=3,pady=15)
 
         
         search_bar.insert(index=0,string="this dont work")
         layout_frame = tk.Frame(self, bg='#131315')
-        layout_frame.grid(row=1,column=0,columnspan=3,pady=0)
+        layout_frame.grid(row=1,column=0,columnspan=3,pady=20)
         array1 = list(range(40))  # First array for the first scrollable area
         array2 = list(range(50))  
         self.create_scrollable_area(layout_frame, array1, 0, action="Songs")
@@ -160,27 +163,27 @@ class HomePage(tk.Frame):
 
 
         # Add title label
-        label = tk.Label(layout_frame, text="Welcome to the Music Player", font=("Arial", 20),bg="#151517",fg="#FEFFFA")
+        label = tk.Label(layout_frame, text="Welcome to the Music Player", font=("Arial", 20),bg="#151517",fg="#FEFFFA",bd=3)
         label.grid(row=0,column=0,columnspan=3,sticky=tk.E + tk.W)
 
         # Button to navigate to the Music Player page
         button = tk.Button(layout_frame, text="Go to Music Player",bg="#151517",fg="#FEFFFA", command=self.go_to_music_player)
-        button.grid(row=1,column=0,pady=5)
+        button.grid(row=1,column=0,pady=30)
 
         # Button to navigate to the Upload page
         upload_button = tk.Button(layout_frame, text="Upload Music",bg="#151517",fg="#FEFFFA", command=self.go_to_upload_page)
-        upload_button.grid(row=1,column=1,pady=5)
-        BOTTOM_frame = tk.LabelFrame(layout_frame,text="playing", bg="#22222C",height=5)
-        BOTTOM_frame.grid(row=4,column=0,columnspan=3,pady=10)
+        upload_button.grid(row=1,column=1,pady=30)
+        BOTTOM_frame = tk.LabelFrame(layout_frame,text="playing", bg="#22222C",fg="#FEFFFA",height=5,width=1240)
+        BOTTOM_frame.grid(row=4,column=0,columnspan=3)
         stop_button = tk.Button(BOTTOM_frame, text="stop",bg="#151517",fg="#FEFFFA", command=self.go_to_music_player)
-        stop_button.grid(row=0,column=2,padx=100,pady=10)
+        stop_button.grid(row=0,column=2,padx=95,pady=10)
         play_button = tk.Button(BOTTOM_frame, text="play",bg="#151517",fg="#FEFFFA", command=self.go_to_upload_page)
-        play_button.grid(row=0,column=1,padx=250,pady=10)
+        play_button.grid(row=0,column=1,padx=400,pady=10)
         cover_label = tk.Label(BOTTOM_frame,text="kh")
-        cover_label.grid(row=0,column=0,padx=100,pady=10)
+        cover_label.grid(row=0,column=0,padx=95,pady=10)
     def create_scrollable_area(self, layout_frame, array, column_index, action):
         scrollable_frame = tk.LabelFrame(layout_frame, text=action, bg='#151517', fg='#FEFFFA', border=10)  
-        scrollable_frame.grid(row=2,column=column_index,pady=10,padx=10)  # Adjusted row index and padding
+        scrollable_frame.grid(row=2,column=column_index,pady=30,padx=30)  # Adjusted row index and padding
 
         # Create a vertical scrollbar
         v = tk.Scrollbar(scrollable_frame)
