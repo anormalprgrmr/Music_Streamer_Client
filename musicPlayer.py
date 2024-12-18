@@ -137,6 +137,7 @@ class HomePage(tk.Frame):
         self.rowconfigure(tuple(range(30)), weight=1)
         print('initttttttttttt')
         self.songs = []
+        self.playlists = []
 
         top_frame = tk.LabelFrame(self, bg='#1A1A20', bd=3, padx=2, relief=tk.SUNKEN,height=500)
         top_frame.grid(row=0,column=0,columnspan=4 ,sticky="news",pady=10)
@@ -161,6 +162,7 @@ class HomePage(tk.Frame):
     def OnShow(self):
 
         self.songs.clear()
+        self.playlists.clear()
 
         result = get_songs()
         print('ressssssult is : ',result)
@@ -229,13 +231,25 @@ class HomePage(tk.Frame):
             self.create_playlists(scrollable_internal_frame, array)
 
     def create_playlists(self, scrollable_frame, array):
-        for i in range(len(array)):
-            button_text = f"playlist {array[i]}"
+        add_button = tk.Button(scrollable_frame, text="+",command= self.create_new_playlist, padx=100, fg='#FEFFFA')
+        add_button.configure(bg="#22222C")
+        add_button.grid(row=1, column=1)
+        for i in range(1,len(self.playlists)):
+            button_text = f"playlists {array[i]}"
             button = tk.Button(scrollable_frame, text=button_text, command=lambda text=button_text: self.open_new_window(text), padx=100, fg='#FEFFFA')
             button.configure(bg="#22222C")
-            number = tk.Label(scrollable_frame, text=f"{i + 1}.", padx=5)
+            number = tk.Label(scrollable_frame, text=f"{i}.", padx=5)
             number.grid(row=i, column=0)
             button.grid(row=i, column=1)
+
+    def create_new_playlist(self):
+        new_window = tk.Toplevel()
+        new_window.title("helo")
+        label = tk.Label(new_window, text="pick a name for your play list")
+        label.grid(row = 0,column=0,padx=20, pady=20)
+        entry = tk.Entry(new_window)
+        entry.grid(row = 1,column=0,padx=20, pady=20)
+
 
     def create_songs(self, scrollable_frame, array):
         for i in range(len(self.songs)):
@@ -243,10 +257,12 @@ class HomePage(tk.Frame):
             button_text = f"song {self.songs[i]['title']}"
             button = tk.Button(scrollable_frame, text=button_text, command=lambda text=button_text: self.open_new_window(text), padx=100, fg='#FEFFFA', anchor="e")
             button.configure(bg="#22222C")
+            add_button = tk.Button(scrollable_frame, text="+", padx=5, fg='#FEFFFA', anchor="e")
+            add_button.configure(bg="#22222C")
             number = tk.Label(scrollable_frame, text=f"{i + 1}.", padx=5)
             number.grid(row=i, column=0)
-            button.grid(row=i, column=1)
-
+            button.grid(row=i, column=1)                
+            add_button.grid(row=i, column=1)   
     def open_new_window(self, button_name):
         new_window = tk.Toplevel()
         new_window.title(button_name)
