@@ -14,32 +14,32 @@ pygame.mixer.init()
 class LoginPage(tk.Frame):
     def __init__(self, parent, controller):
         super().__init__(parent)
-        self.config(width=1240,height=700,padx=500,bg='#1C1C24')
+        self.config(width=1240,height=700,padx=530,pady=30,bg='#1C1C24')
         self.controller = controller
 
         # Add title label
-        label = tk.Label(self, text="Login", font=("Arial", 20))
+        label = tk.Label(self, text="Login", font=("Arial", 20),bg="#151517",bd=1,fg="#FEFFFA",relief=tk.SUNKEN)
         label.pack(pady=50)
 
         # Username Label and Entry
-        self.username_label = tk.Label(self, text="Username:", font=("Arial", 12))
+        self.username_label = tk.Label(self, text="Username:",bg="#1C1C24",fg="#FEFFFA", font=("Arial", 12))
         self.username_label.pack(pady=10)
         self.username_entry = tk.Entry(self, font=("Arial", 12))
         self.username_entry.pack(pady=5)
 
         # Password Label and Entry
-        self.password_label = tk.Label(self, text="Password:", font=("Arial", 12))
+        self.password_label = tk.Label(self, text="Password:",bg="#1C1C24",fg="#FEFFFA",font=("Arial", 12))
         self.password_label.pack(pady=10)
         self.password_entry = tk.Entry(self, font=("Arial", 12), show="*")
         self.password_entry.pack(pady=5)
 
         # Login Button
-        login_button = tk.Button(self, text="Login", font=("Arial", 14), bg="#4CAF50", fg="white", command=self.login)
+        login_button = tk.Button(self, text="Login", font=("Arial", 14),bg="#FE0104",fg="#FEFFFA", command=self.login)
         login_button.pack(pady=20)
 
         # Link to Sign Up page
-        signup_button = tk.Button(self, text="Don't have an account? Sign Up", font=("Arial", 12), command=self.go_to_signup_page)
-        signup_button.pack(pady=10)
+        signup_button = tk.Button(self, text="Don't have an account? Sign Up", font=("Arial", 12),bg="#1C1C24",fg="#FEFFFA", command=self.go_to_signup_page)
+        signup_button.pack(pady=100)
 
     def login(self):
         username = self.username_entry.get()
@@ -67,38 +67,38 @@ class LoginPage(tk.Frame):
 class SignupPage(tk.Frame):
     def __init__(self, parent, controller):
         super().__init__(parent)
-        self.config(width=1240,height=700,padx=500,bg='#1C1C24')
+        self.config(width=1240,height=700,padx=530,pady=30,bg='#1C1C24')
         self.controller = controller
 
         # Add title label
-        label = tk.Label(self, text="Sign Up", font=("Arial", 20))
+        label = tk.Label(self, text="Sign Up", font=("Arial", 20),bg="#151517",fg="#FEFFFA",bd=1,relief=tk.SUNKEN)
         label.pack(pady=50)
 
         # Username Label and Entry
-        self.username_label = tk.Label(self, text="Username:", font=("Arial", 12))
+        self.username_label = tk.Label(self, text="Username:", font=("Arial", 12),bg="#1C1C24",fg="#FEFFFA")
         self.username_label.pack(pady=10)
         self.username_entry = tk.Entry(self, font=("Arial", 12))
         self.username_entry.pack(pady=5)
 
         # Password Label and Entry
-        self.password_label = tk.Label(self, text="Password:", font=("Arial", 12))
+        self.password_label = tk.Label(self, text="Password:", font=("Arial", 12),bg="#1C1C24",fg="#FEFFFA")
         self.password_label.pack(pady=10)
         self.password_entry = tk.Entry(self, font=("Arial", 12), show="*")
         self.password_entry.pack(pady=5)
 
         # Confirm Password Label and Entry
-        self.confirm_password_label = tk.Label(self, text="Confirm Password:", font=("Arial", 12))
+        self.confirm_password_label = tk.Label(self, text="Confirm Password:", font=("Arial", 12),bg="#1C1C24",fg="#FEFFFA")
         self.confirm_password_label.pack(pady=10)
         self.confirm_password_entry = tk.Entry(self, font=("Arial", 12), show="*")
         self.confirm_password_entry.pack(pady=5)
 
         # Sign Up Button
-        signup_button = tk.Button(self, text="Sign Up", font=("Arial", 14), bg="#4CAF50", fg="white", command=self.signup)
+        signup_button = tk.Button(self, text="Sign Up", font=("Arial", 14),bg="#FE0104",fg="#FEFFFA", command=self.signup)
         signup_button.pack(pady=20)
 
         # Link to Login page
-        login_button = tk.Button(self, text="Already have an account? Login", font=("Arial", 12), command=self.go_to_login_page)
-        login_button.pack(pady=10)
+        login_button = tk.Button(self, text="Already have an account? Login", font=("Arial", 12), command=self.go_to_login_page,bg="#151517",fg="#FEFFFA")
+        login_button.pack(pady=100)
 
     def signup(self):
         username = self.username_entry.get()
