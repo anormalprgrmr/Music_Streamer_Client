@@ -159,6 +159,15 @@ class HomePage(tk.Frame):
         
         search_bar.insert(index=0,string="this dont work")
         
+        global songname
+        songname = "madareto"
+
+        self.is_playing = False
+        self.song_length = 0
+        self.music_file = "ss.mp3"  # Replace with the actual path to the music file
+        self.manual_update = False  # Flag to detect manual updates on the scale
+
+
     def OnShow(self):
 
         self.songs.clear()
@@ -192,9 +201,9 @@ class HomePage(tk.Frame):
         upload_button.grid(row=1,column=1,pady=30)
         BOTTOM_frame = tk.LabelFrame(layout_frame,text="playing", bg="#22222C",fg="#FEFFFA",height=5,width=1240)
         BOTTOM_frame.grid(row=4,column=0,columnspan=3)
-        stop_button = tk.Button(BOTTOM_frame, text="stop",bg="#151517",fg="#FEFFFA", command=self.go_to_music_player)
+        stop_button = tk.Button(BOTTOM_frame, text="stop",bg="#151517",fg="#FEFFFA", command=self.stop_music)
         stop_button.grid(row=0,column=2,padx=95,pady=10)
-        play_button = tk.Button(BOTTOM_frame, text="play",bg="#151517",fg="#FEFFFA", command=self.go_to_upload_page)
+        play_button = tk.Button(BOTTOM_frame, text="play",bg="#151517",fg="#FEFFFA", command=self.play_music)
         play_button.grid(row=0,column=1,padx=400,pady=10)
         cover_label = tk.Label(BOTTOM_frame,text="kh")
         cover_label.grid(row=0,column=0,padx=95,pady=10)
@@ -277,6 +286,81 @@ class HomePage(tk.Frame):
 
     def go_to_upload_page(self):
         self.controller.show_page(UploadPage)
+
+    def play_music(self):
+        if not self.is_playing:
+            if not os.path.exists(self.music_file):
+                print(f"Error: Music file '{self.music_file}' not found.")
+                return
+
+            pygame.mixer.music.load(self.music_file)
+            pygame.mixer.music.play()
+            self.is_playing = True
+
+            # Get song length (in seconds)
+            self.song_length = pygame.mixer.Sound(self.music_file).get_length()
+
+            # Extract cover image from the MP3 file
+            self.show_cover_image_from_mp3(self.music_file)
+
+            # Start updating the scale (song progress)
+            self.update_progress_scale()
+
+    def stop_music(self):
+        if self.is_playing:
+            pygame.mixer.music.stop()
+            self.is_playing = False
+            self.progress_scale.set(0)  # Reset progress scale
+            self.cover_image_label1.config(image="")  # Clear cover image
+
+    def update_progress_scale(self):
+        if self.is_playing:
+            # Get the current position of the song (in seconds)
+            current_time = pygame.mixer.music.get_pos() / 1000  # Convert milliseconds to seconds
+            progress = (current_time / self.song_length) * 100  # Calculate progress as a percentage
+
+            # Only update scale if the user hasn't manually changed it
+            if not self.manual_update:
+                self.progress_scale.set(progress)  # Update the scale
+
+            # Continue updating the progress scale every 100ms
+            self.after(100, self.update_progress_scale)  # Keep updating even if the song is near the end
+
+
+    def show_cover_image_from_mp3(self, mp3_file):
+        """Extract and show cover image from MP3 metadata"""
+        audio_file = eyed3.load(mp3_file)
+
+        # Check if there's any album art
+        if audio_file.tag is not None and audio_file.tag.images:
+            # Get the first image (usually album art)
+            image_data = audio_file.tag.images[0].image_data
+            
+
+            # Open the image from binary data
+            image = Image.open(BytesIO(image_data))
+            image = image.resize((150, 150))  # Resize to fit the window
+
+            # Convert to PhotoImage and display it
+            self.cover_image = ImageTk.PhotoImage(image)
+            self.cover_image_label.grid_forget
+            self.cover_image_label1 = tk.Label(self)
+            self.cover_image_label1.grid(row=1,column=1)
+            self.cover_image_label1.config(image=self.cover_image)
+        else:
+            print("No cover image found in MP3 metadata.")
+
+    def on_scale_release(self, event):
+        """When the user releases the scale, update the song's position"""
+        self.manual_update = False  # Reset the flag when user releases the slider
+        progress_percentage = float(self.progress_scale.get())
+        new_pos = (progress_percentage / 100) * self.song_length  # Convert percentage to actual seconds
+        pygame.mixer.music.set_pos(new_pos)  # Set the new position in the song
+
+    def on_scale_click(self, event):
+        """Flag that the user is manually adjusting the slider"""
+        self.manual_update = True
+
 
 
 
